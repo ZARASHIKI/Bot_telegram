@@ -55,12 +55,35 @@ bot.on("message", async (msg) => {
         formattedData += `ID:${item.id_makanan}\nNama Barang: ${item.nama_barang}\nHarga Barang: ${item.harga_barang}\nFoto: ${item.gambar_barang}\nMerek${item.merek_barang}\n\n`;
       });
   
-      bot.sendMessage(chatId, `Data:\n${formattedData}`);
+      bot.sendMessage(chatId, `Nama Barang:\n${formattedData}`);
     } catch (error) {
       bot.sendMessage(chatId, "Error reading data");
     }
 
-  } else if (messageText.startsWith("/update")) {
+  } else if (messageText.startsWith("/baca")) {
+    const data = messageText.replace("/baca", "").trim();
+    const [nama_barang] = data.split(" ");
+  if (nama_barang) {
+	try {
+	      const data = await sendRequest("/api/readata", "POST",{nama_barang});
+	      // await sendRequest("/api/readata", "GET");
+	      let formattedData = "";
+	  
+	      data.forEach((item) => {
+	        formattedData += `ID:${item.id_makanan}\nNama Barang: ${item.nama_barang}\nHarga Barang: ${item.harga_barang}\nFoto: ${item.gambar_barang}\nMerek${item.merek_barang}\n\n`;
+	      });
+	  
+	      bot.sendMessage(chatId, `Data:\n${formattedData}`);
+        
+	    } catch (error) {
+	      bot.sendMessage(chatId, "Error reading data");
+	    } 
+}else {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, "Silakan masukkan data untuk Diupdate dengan Format /baca [nama barang]");
+} 
+  }  
+  else if (messageText.startsWith("/update")) {
     const data = messageText.replace("/update", "").trim();
     const [nama_barang,id_makanan] = data.split(" ");
     if (nama_barang && id_makanan) {
@@ -96,7 +119,8 @@ bot.on("message", async (msg) => {
       "/create - Membuat data baru",
       "/read - Membaca data",
       "/update - Memperbarui data",
-      "/delete - Menghapus data"
+      "/delete - Menghapus data",
+      "/baca - Membaca data berdasarkan nama barang"
     ];
     
     const formattedCommands = commands.join("\n");
